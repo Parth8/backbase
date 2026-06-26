@@ -87,7 +87,6 @@ body::before {
   inset: 0;
   display: grid;
   grid-template-columns: 1fr;
-  align-content: center; /* fallback for older Safari */
   align-content: safe center;
   padding: clamp(60px, 8vh, 96px) var(--gutter) clamp(100px, 13vh, 132px);
   opacity: 0;

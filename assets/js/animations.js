@@ -102,10 +102,7 @@
     // setup lines
     lines.forEach((l) => {
       let len = 600;
-      try {
-        const tl = l.getTotalLength();
-        len = (tl && tl > 0) ? tl : 600;
-      } catch (e) {}
+      try { len = l.getTotalLength() || 600; } catch (e) {}
       l.classList.add("draw-line");
       l.classList.remove("is-drawn");
       l.style.setProperty("--len", len);
@@ -141,10 +138,7 @@
 
     if (line) {
       let len = 1020;
-      try {
-        const tl = line.getTotalLength();
-        len = (tl && tl > 0) ? tl : 1020;
-      } catch (e) {}
+      try { len = line.getTotalLength() || 1020; } catch (e) {}
       line.classList.add("draw-line");
       line.classList.remove("is-drawn");
       line.style.setProperty("--len", len);
