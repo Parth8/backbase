@@ -99,14 +99,14 @@
         </div>
         <!-- row 3 -->
         <div style="padding:13px 22px; border-bottom:1px solid var(--line); border-right:1px solid var(--line-strong);">
-          <div class="stake__name">Peter · Head of Eng &amp; Integration</div><div class="stake__role">UAT lead · signed the spec · I plan with him</div>
+          <div class="stake__name">Peter · Head of Eng &amp; Integration</div><div class="stake__role">Engineering & QA Lead · signed the spec · I plan with him</div>
         </div>
         <div style="padding:13px 22px; border-bottom:1px solid var(--line);">
           <div class="stake__name">2 Engineers · QA Lead</div><div class="stake__role">Building and testing the happy path</div>
         </div>
         <!-- row 4 -->
         <div style="padding:13px 22px; border-right:1px solid var(--line-strong);">
-          <div class="stake__name">Maria · Payments Ops Lead</div><div class="stake__role">Runs ops day one · flagged this for weeks</div>
+          <div class="stake__name">Maria · Payments Ops Lead</div><div class="stake__role">Runs ops day one · flagged this inconsistency</div>
         </div>
         <div style="padding:13px 22px;">
           <div class="stake__name">Customer Success Dir · Connector PM</div><div class="stake__role">Owns the relationship · owns the platform baseline</div>
@@ -114,7 +114,7 @@
       </div>
     </div>
     <p class="enter" data-d="4" style="margin-top:16px; font-family:var(--mono); font-size:11.5px; letter-spacing:0.08em; color:var(--ink-soft);">
-      PHASE 1 (now) credit transfers &nbsp;·&nbsp; PHASE 2 direct debits &nbsp;·&nbsp; PHASE 3 cards &nbsp;&nbsp;|&nbsp;&nbsp; I own the product surface, not the timeline (CSD) or the technical design (SA)
+      PHASE 1 (now) credit transfers &nbsp;·&nbsp; PHASE 2 direct debits &nbsp;·&nbsp; PHASE 3 cards &nbsp;&nbsp;|&nbsp;&nbsp; I own the product surface
     </p>
   </div>
 </section>
@@ -196,8 +196,8 @@
       <div class="mail mail--alert enter" data-d="2" style="display:grid; grid-template-columns:30px 1fr; gap:16px; align-items:start;">
         <div class="list__num" style="margin-top:2px;">1</div>
         <div>
-          <div class="mail__head"><span class="mail__from">Peter · Head of Eng &amp; Integration</span><span class="mail__meta">Tue, morning</span></div>
-          <div class="mail__body"><p>47 failures out of 500 in UAT cycle 3. I have flagged 23 of them: blank, generic, or raw codes we do not recognise. <strong>We do not understand the pattern.</strong> We need this resolved before sign-off.</p></div>
+          <div class="mail__head"><span class="mail__from">Maria · Payments Ops Lead</span><span class="mail__meta">Tue, morning</span></div>
+          <div class="mail__body"><p>47 failures out of 500 in UAT. I have flagged 23 of them: blank, generic, or raw codes we do not recognise. <strong>We do not understand the pattern.</strong> Peter from engg says this is a Backbase-side issue. We need this resolved before sign-off.</p></div>
         </div>
       </div>
       <div class="mail enter" data-d="3" style="display:grid; grid-template-columns:30px 1fr; gap:16px; align-items:start;">
@@ -218,7 +218,7 @@
         <div class="list__num" style="margin-top:2px; color:var(--rust); border-color:var(--rust-line);">4</div>
         <div>
           <div class="mail__head"><span class="mail__from">Henrik · CTO</span><span class="mail__meta">Wed, 08:47</span></div>
-          <div class="mail__body"><p>I need a status update by end of day. <strong>The launch date is not moving</strong> - board in five weeks, marketing already live. Send me a clear plan.</p></div>
+          <div class="mail__body"><p>I need a status update by end of day. <strong>The launch date is not moving</strong> - board meeting in five weeks, marketing already live. Send me a clear plan by EOD.</p></div>
         </div>
       </div>
     </div>
@@ -226,12 +226,46 @@
   </div>
 </section>
 
-<!-- SLIDE 5 - The data + the real problem -->
+<!-- SLIDE 5 - First response + how I work -->
 <section class="slide" id="s5">
   <div class="wrap">
     <div class="spread">
       <div class="spread__main">
-        <div class="eyebrow enter" data-d="1">What Peter Sent</div>
+        <div class="eyebrow enter" data-d="1">First Move · Wednesday morning</div>
+        <h2 class="display display--m enter" data-d="1">I answer Henrik first, briefly</h2>
+        <p class="prose enter" data-d="2" style="margin:16px 0 22px;">
+          I cannot leave the CTO on delivered, and I cannot send him a guess. So I acknowledge,
+          show we are already moving, and buy the day to diagnose properly.
+        </p>
+        <div class="mail mail--cta enter" data-d="3">
+          <div class="mail__head"><span class="mail__from">To: Henrik · CTO</span><span class="mail__meta">Wed, 09:10</span></div>
+          <div class="mail__body">
+            <p>Hi Henrik,</p>
+            <p>Thank you for the note. We have had a joint session with your engineering and QA and our own, and we are going through the failure data now. I will have a clear plan to you by end of day.</p>
+            <p>The launch date is our shared target and I am treating it that way.</p>
+            <p>Regards,<br>Parth</p>
+          </div>
+        </div>
+      </div>
+      <div class="spread__margin enter" data-d="4">
+        <p class="figtag" style="margin-bottom:12px;">How I work the next few hours</p>
+        <p class="marg"><span class="marg__label">Understand before I answer</span>Read the data with my own eyes before I trust anyone's read of it, including engineering's.</p>
+        <p class="marg"><span class="marg__label">One voice</span>Align with engineering, the SA, and the CSD internally, so the bank hears one position, not three.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<!-- ACT 3 - THE INVESTIGATION                              -->
+<!-- ===================================================== -->
+
+  <!-- SLIDE 6 - The data + the real problem -->
+<section class="slide" id="s6">
+  <div class="wrap">
+    <div class="spread">
+      <div class="spread__main">
+        <div class="eyebrow enter" data-d="1">What Maria Sent</div>
         <h2 class="display display--m enter" data-d="1">500 transactions. 47 failed. 23 ops cannot use.</h2>
         <p class="prose enter" data-d="2" style="margin:18px 0 26px;">
           The failures look random, which is why Maria's team is stuck. They cannot predict, from the
@@ -259,40 +293,6 @@
         <p class="figtag" style="margin-bottom:12px;">The real problem</p>
         <p class="marg">Ops cannot tell <strong>what</strong> failed or <strong>where</strong> it failed. Without that, every one of the 23 becomes a manual investigation. Unpredictable, and it does not scale.</p>
         <p class="marg"><span class="marg__label">The dataset</span>500 synthetic transactions with full request and response payloads, plus 301 connector log lines. Real, and linked in the repo.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================================================== -->
-<!-- ACT 3 - THE INVESTIGATION                              -->
-<!-- ===================================================== -->
-
-<!-- SLIDE 6 - First response + how I work -->
-<section class="slide" id="s6">
-  <div class="wrap">
-    <div class="spread">
-      <div class="spread__main">
-        <div class="eyebrow enter" data-d="1">First Move · Wednesday morning</div>
-        <h2 class="display display--m enter" data-d="1">I answer Henrik first, briefly</h2>
-        <p class="prose enter" data-d="2" style="margin:16px 0 22px;">
-          I cannot leave the CTO on delivered, and I cannot send him a guess. So I acknowledge,
-          show we are already moving, and buy the day to diagnose properly.
-        </p>
-        <div class="mail mail--cta enter" data-d="3">
-          <div class="mail__head"><span class="mail__from">To: Henrik · CTO</span><span class="mail__meta">Wed, 09:10</span></div>
-          <div class="mail__body">
-            <p>Hi Henrik,</p>
-            <p>Thank you for the note. We have had a joint session with your engineering and QA and our own, and we are going through the failure data now. I will have a clear plan to you by end of day.</p>
-            <p>The launch date is our shared target and I am treating it that way.</p>
-            <p>Parth</p>
-          </div>
-        </div>
-      </div>
-      <div class="spread__margin enter" data-d="4">
-        <p class="figtag" style="margin-bottom:12px;">How I work the next few hours</p>
-        <p class="marg"><span class="marg__label">Understand before I answer</span>Read the data with my own eyes before I trust anyone's read of it, including engineering's.</p>
-        <p class="marg"><span class="marg__label">One voice</span>Align with engineering, the SA, and the CSD internally, so the bank hears one position, not three.</p>
       </div>
     </div>
   </div>
