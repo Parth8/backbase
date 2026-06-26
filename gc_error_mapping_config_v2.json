@@ -1,0 +1,1485 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "connector": "grand-central-payments-connector",
+    "description": "Error code mapping configuration for Grand Central Payments Connector v2.0. Covers SEPA (SCT, SCT Inst), SWIFT (gpi, MT103/MT199), and Temenos T24 core banking error codes. This config is the customisation layer - the canonical envelope structure is defined in the connector platform. Banks provide T24 section mappings based on their specific core configuration. SEPA and SWIFT sections are platform-standard and apply to all implementations.",
+    "maintainer": "Backbase Forward Deployed PM - Meridian Bank NV",
+    "lastUpdated": "2025-03-17",
+    "effectiveFrom": "2025-04-15",
+    "bankId": "meridian-bank-nv",
+    "supportedPaymentMethods": ["SCT", "SCT_INST", "SWIFT"],
+    "schemaVersion": "1.0"
+  },
+
+  "sepa": {
+    "description": "ISO 20022 pain.002 reason codes for SEPA Credit Transfer (SCT) and SEPA Credit Transfer Instant (SCT Inst). Source: EPC rulebook and ISO 20022 external code set. These codes are scheme-defined and apply uniformly across all SEPA implementations. No bank-specific customisation required.",
+
+    "account": {
+      "AC01": {
+        "canonical": "INCORRECT_ACCOUNT_NUMBER",
+        "reason": "The account number specified is incorrect or does not exist.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60,
+        "notes": "Creditor IBAN failed format or existence check at the creditor bank."
+      },
+      "AC02": {
+        "canonical": "INVALID_DEBTOR_ACCOUNT",
+        "reason": "The debtor account number is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60,
+        "notes": "Unexpected in outbound flow - debtor account should have been validated by T24 before initiation."
+      },
+      "AC03": {
+        "canonical": "INVALID_CREDITOR_ACCOUNT",
+        "reason": "The creditor account number is invalid or incorrect format.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AC04": {
+        "canonical": "ACCOUNT_CLOSED",
+        "reason": "The creditor account has been closed.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60,
+        "notes": "Customer must provide alternative account details."
+      },
+      "AC06": {
+        "canonical": "ACCOUNT_BLOCKED",
+        "reason": "The creditor account is blocked and cannot receive funds.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AC07": {
+        "canonical": "ACCOUNT_CLOSED_CREDITOR",
+        "reason": "The creditor account is closed.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AC13": {
+        "canonical": "INVALID_DEBTOR_ACCOUNT_TYPE",
+        "reason": "Invalid debtor account type for this payment.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 120
+      },
+      "AC14": {
+        "canonical": "INVALID_AGENT_ACCOUNT",
+        "reason": "Agent account is invalid or does not support this payment type.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_SCHEME",
+        "slaMinutes": 240
+      }
+    },
+
+    "amount": {
+      "AM01": {
+        "canonical": "ZERO_AMOUNT",
+        "reason": "The payment amount is zero.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60,
+        "notes": "Should have been caught at connector validation. Escalate to integration team."
+      },
+      "AM02": {
+        "canonical": "NOT_ALLOWED_AMOUNT",
+        "reason": "The payment amount is not allowed for this transaction type.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AM03": {
+        "canonical": "NOT_ALLOWED_CURRENCY",
+        "reason": "The payment currency is not allowed.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60,
+        "notes": "SEPA requires EUR. Non-EUR currency should have been caught at connector validation."
+      },
+      "AM04": {
+        "canonical": "INSUFFICIENT_FUNDS",
+        "reason": "Insufficient funds in the debtor account.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60,
+        "notes": "Balance check at T24 should catch this before rail submission. If seen at rail, investigate pre-flight check timing."
+      },
+      "AM05": {
+        "canonical": "DUPLICATE_PAYMENT",
+        "reason": "This payment appears to be a duplicate of a previously submitted transaction.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 30,
+        "notes": "URGENT - investigate before any retry. Original payment may have succeeded."
+      },
+      "AM06": {
+        "canonical": "TOO_LOW_AMOUNT",
+        "reason": "The payment amount is below the minimum allowed.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AM07": {
+        "canonical": "AMOUNT_BLOCKED",
+        "reason": "Amount has been blocked.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "AM09": {
+        "canonical": "WRONG_AMOUNT",
+        "reason": "The amount received is not the amount agreed or expected.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "AM10": {
+        "canonical": "INVALID_CONTROL_SUM",
+        "reason": "Payment control sum is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "AM11": {
+        "canonical": "INVALID_TRANSACTION_CURRENCY",
+        "reason": "Transaction currency is invalid for this payment type.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "AM12": {
+        "canonical": "INVALID_AMOUNT",
+        "reason": "Amount is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "AM14": {
+        "canonical": "AMOUNT_EXCEEDS_AGREED_LIMIT",
+        "reason": "The payment amount exceeds the agreed limit.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      }
+    },
+
+    "beneficiary": {
+      "BE01": {
+        "canonical": "INCONSISTENT_WITH_END_CUSTOMER",
+        "reason": "The creditor identification details are inconsistent with the end customer.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "BE04": {
+        "canonical": "MISSING_CREDITOR_ADDRESS",
+        "reason": "Creditor address is missing or incomplete.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "BE05": {
+        "canonical": "UNRECOGNISED_INITIATING_PARTY",
+        "reason": "Initiating party is not recognised by the scheme.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_SCHEME",
+        "slaMinutes": 120
+      },
+      "BE06": {
+        "canonical": "UNKNOWN_END_CUSTOMER",
+        "reason": "End customer is not recognised.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "BE07": {
+        "canonical": "MISSING_DEBTOR_ADDRESS",
+        "reason": "Debtor address is missing or incomplete.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "BE08": {
+        "canonical": "NAME_MISMATCH",
+        "reason": "Debtor name does not match the account.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "BE09": {
+        "canonical": "INVALID_COUNTRY",
+        "reason": "Country code is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "BE10": {
+        "canonical": "INVALID_DEBTOR_COUNTRY",
+        "reason": "Debtor country is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "BE11": {
+        "canonical": "INVALID_CREDITOR_COUNTRY",
+        "reason": "Creditor country code is invalid or not supported for this payment type.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "BE16": {
+        "canonical": "INVALID_DEBTOR_IDENTIFICATION",
+        "reason": "Debtor identification is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "BE17": {
+        "canonical": "INVALID_CREDITOR_IDENTIFICATION",
+        "reason": "Creditor identification is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      }
+    },
+
+    "format": {
+      "FF01": {
+        "canonical": "INVALID_FILE_FORMAT",
+        "reason": "The payment message format is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60,
+        "notes": "Connector-level validation should have caught this. Investigate connector request construction."
+      },
+      "FF02": {
+        "canonical": "INVALID_SYNTAX",
+        "reason": "Message syntax error.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF03": {
+        "canonical": "INVALID_PAYMENT_TYPE",
+        "reason": "Payment type information is missing or incorrect.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF04": {
+        "canonical": "INVALID_SERVICE_LEVEL",
+        "reason": "Service level code is missing or invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF05": {
+        "canonical": "INVALID_LOCAL_INSTRUMENT",
+        "reason": "Local instrument code is missing or invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF06": {
+        "canonical": "INVALID_CATEGORY_PURPOSE",
+        "reason": "Category purpose code is missing or invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF07": {
+        "canonical": "INVALID_PURPOSE",
+        "reason": "Purpose code is missing or invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF08": {
+        "canonical": "INVALID_END_TO_END_ID",
+        "reason": "End-to-end reference is missing or has invalid format.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF09": {
+        "canonical": "INVALID_REMITTANCE_INFO",
+        "reason": "Remittance information is missing or has an invalid format.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "FF10": {
+        "canonical": "BANK_SYSTEM_PROCESSING_ERROR",
+        "reason": "Bank system processing error at the scheme level.",
+        "origin": "RAIL",
+        "category": "RETRYABLE",
+        "paymentState": "REJECTED",
+        "retryable": true,
+        "retryAfterMinutes": 30,
+        "opsAction": "RETRY_SAFE",
+        "slaMinutes": 60
+      }
+    },
+
+    "routing": {
+      "CNOR": {
+        "canonical": "CREDITOR_BANK_NOT_REGISTERED",
+        "reason": "Creditor bank is not registered in the SEPA scheme.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60,
+        "notes": "The beneficiary bank does not participate in SEPA. Customer must use alternative payment method (e.g. SWIFT)."
+      },
+      "DNOR": {
+        "canonical": "DEBTOR_BANK_NOT_REGISTERED",
+        "reason": "Debtor bank is not registered in the SEPA scheme.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_SCHEME",
+        "slaMinutes": 120,
+        "notes": "Meridian itself is not registered. Critical - escalate immediately to scheme operations."
+      }
+    },
+
+    "regulatory": {
+      "RR01": {
+        "canonical": "REGULATORY_REASON_MISSING_DEBTOR_ACCOUNT",
+        "reason": "Regulatory reason - debtor account missing.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "RR02": {
+        "canonical": "REGULATORY_REASON_MISSING_DEBTOR_NAME",
+        "reason": "Regulatory reason - debtor name or address missing.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "RR03": {
+        "canonical": "REGULATORY_REASON_MISSING_CREDITOR_NAME",
+        "reason": "Regulatory reason - creditor name or address missing.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "RR04": {
+        "canonical": "REGULATORY_REASON",
+        "reason": "Payment rejected for regulatory reasons.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 60
+      },
+      "RR05": {
+        "canonical": "REGULATORY_INFORMATION_INVALID",
+        "reason": "Regulatory information is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "RR06": {
+        "canonical": "TAX_INFORMATION_MISSING",
+        "reason": "Tax information is missing or invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "RR07": {
+        "canonical": "REMITTANCE_INFORMATION_INVALID",
+        "reason": "Remittance information structure is invalid for regulatory requirements.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 120
+      },
+      "RR08": {
+        "canonical": "PAYMENT_MEAN_NOT_SUPPORTED",
+        "reason": "The requested payment method is not supported for regulatory reasons.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "RR09": {
+        "canonical": "MANDATE_INFORMATION_INVALID",
+        "reason": "Mandate information is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "RR10": {
+        "canonical": "INVALID_STRUCTURED_CREDITOR_REFERENCE",
+        "reason": "Structured creditor reference is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "RR11": {
+        "canonical": "INVALID_DEBTOR_AGENT_SERVICE_ID",
+        "reason": "Debtor agent service identification is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_SCHEME",
+        "slaMinutes": 120
+      },
+      "RR12": {
+        "canonical": "INVALID_PARTY_IDENTIFICATION",
+        "reason": "Party identification is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      }
+    },
+
+    "narrative": {
+      "MS01": {
+        "canonical": "MISSING_CREDITOR_SCHEME_IDENTIFICATION",
+        "reason": "Creditor scheme identification is missing.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "MS02": {
+        "canonical": "NOT_SPECIFIED_REASON_BY_AGENT",
+        "reason": "Reason not specified by the agent. No further detail available from the scheme.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_RAIL",
+        "slaMinutes": 120,
+        "notes": "Raise a scheme inquiry to obtain the underlying rejection reason."
+      },
+      "MS03": {
+        "canonical": "NOT_SPECIFIED_REASON_BY_AGENT_MEMBER",
+        "reason": "Reason not specified by the agent member. No structured code available.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_RAIL",
+        "slaMinutes": 120,
+        "notes": "This code is used when the rejecting bank cannot or will not specify the reason. Scheme inquiry required."
+      },
+      "NARR": {
+        "canonical": "NARRATIVE_REJECTION",
+        "reason": "Payment rejected with a free-text narrative reason. No structured code provided.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_RAIL",
+        "slaMinutes": 120,
+        "notes": "See rawCode and connector logs for the narrative text. Manual interpretation required."
+      }
+    },
+
+    "technical": {
+      "TECH": {
+        "canonical": "TECHNICAL_ISSUE",
+        "reason": "Technical issue at the scheme level.",
+        "origin": "RAIL",
+        "category": "RETRYABLE",
+        "paymentState": "REJECTED",
+        "retryable": true,
+        "retryAfterMinutes": 15,
+        "opsAction": "RETRY_SAFE",
+        "slaMinutes": 30,
+        "notes": "Transient scheme error. Safe to retry after 15 minutes."
+      },
+      "CUST": {
+        "canonical": "SETTLEMENT_CANCELLED_BY_CUSTOMER",
+        "reason": "Payment cancelled by the customer.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "CUTA": {
+        "canonical": "SETTLEMENT_CUT_OFF",
+        "reason": "Payment cut-off time has passed. Payment will be reprocessed on the next business day.",
+        "origin": "RAIL",
+        "category": "RETRYABLE",
+        "paymentState": "PENDING",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60,
+        "notes": "Not a failure - payment will be resubmitted next business day. Monitor for settlement."
+      },
+      "DUPL": {
+        "canonical": "DUPLICATE_PAYMENT",
+        "reason": "Payment is a duplicate of a previously submitted transaction.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 30,
+        "notes": "URGENT - do not retry. Original payment may have succeeded. Investigate immediately."
+      },
+      "XNAM": {
+        "canonical": "UNKNOWN_IN_SCHEME",
+        "reason": "Payment rejected by scheme for unknown reason.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_SCHEME",
+        "slaMinutes": 60
+      }
+    },
+
+    "date": {
+      "DT01": {
+        "canonical": "INVALID_DATE",
+        "reason": "Requested execution date is in the past or otherwise invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "DT02": {
+        "canonical": "INVALID_CREATION_DATE",
+        "reason": "Message creation date is invalid.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      }
+    }
+  },
+
+  "swift": {
+    "description": "SWIFT error codes for cross-border wire transfers via the SWIFT gpi network. Covers ISO 20022 pacs.002 status codes, SWIFT gpi status codes, and MT199 field 72 structured codes. Free-text narrative rejections from correspondent banks (MT199 field 79) cannot be enumerated and fall through to the fallback handler.",
+
+    "gpi_status": {
+      "ACSC": {
+        "canonical": "SETTLED",
+        "reason": "Payment has been settled successfully.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "ACCEPTED",
+        "retryable": false,
+        "opsAction": "NO_ACTION",
+        "slaMinutes": null,
+        "notes": "Confirmation of final settlement. No action required."
+      },
+      "ACSP": {
+        "canonical": "PROCESSING",
+        "reason": "Payment accepted and in process. Settlement is pending.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "PENDING",
+        "retryable": false,
+        "opsAction": "MONITOR",
+        "slaMinutes": 1440,
+        "notes": "NOT A FAILURE. Payment is in the correspondent banking chain. Monitor gpi tracker for status updates. Do not retry."
+      },
+      "ACWP": {
+        "canonical": "ACCEPTED_WITHOUT_POSTING",
+        "reason": "Payment accepted but not yet posted to the creditor account.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "PENDING",
+        "retryable": false,
+        "opsAction": "MONITOR",
+        "slaMinutes": 480,
+        "notes": "Intermediary has accepted but not posted. May indicate correspondent processing delay. Monitor."
+      },
+      "ACCC": {
+        "canonical": "ACCEPTED_CUSTOMER_CREDIT",
+        "reason": "Payment accepted and credited to customer account.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "ACCEPTED",
+        "retryable": false,
+        "opsAction": "NO_ACTION",
+        "slaMinutes": null
+      },
+      "RJCT": {
+        "canonical": "SWIFT_REJECTED",
+        "reason": "Payment rejected by the SWIFT network or a participant bank.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_RAIL",
+        "slaMinutes": 120,
+        "notes": "Check rawCode for the underlying ISO 20022 reason code if present. Raise SWIFT case if no structured code available."
+      },
+      "PDNG": {
+        "canonical": "PENDING",
+        "reason": "Payment is pending. Awaiting further processing.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "PENDING",
+        "retryable": false,
+        "opsAction": "MONITOR",
+        "slaMinutes": 240,
+        "notes": "NOT A FAILURE. Monitor gpi tracker for status updates."
+      }
+    },
+
+    "mt199_structured": {
+      "REJT": {
+        "canonical": "MT199_REJECTION",
+        "reason": "Payment rejected via MT199 message.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_RAIL",
+        "slaMinutes": 120,
+        "notes": "See rawCode for the field 72 or field 79 narrative from the rejecting bank."
+      },
+      "RETN": {
+        "canonical": "RETURNED",
+        "reason": "Payment returned by the beneficiary bank after initial acceptance.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 120,
+        "notes": "Funds will be returned to the debtor account. Timeline depends on correspondent bank."
+      },
+      "CNCL": {
+        "canonical": "CANCELLED",
+        "reason": "Payment has been cancelled.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "SSPD": {
+        "canonical": "SUSPENDED",
+        "reason": "Payment is suspended, typically for compliance or regulatory review.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "HOLD",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 60,
+        "notes": "Do not retry. Escalate to compliance team immediately. Funds are held pending review."
+      },
+      "DUPL": {
+        "canonical": "DUPLICATE_SWIFT",
+        "reason": "Duplicate payment detected by SWIFT network.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 30,
+        "notes": "URGENT - do not retry. Original payment may have settled. Investigate immediately."
+      },
+      "NAUT": {
+        "canonical": "NOT_AUTHORISED",
+        "reason": "Payment not authorised by a participant bank.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "UPAY": {
+        "canonical": "UNDUE_PAYMENT",
+        "reason": "Payment identified as undue.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 120
+      },
+      "COVR": {
+        "canonical": "COVER_PAYMENT",
+        "reason": "Cover payment related issue.",
+        "origin": "RAIL",
+        "category": "INVESTIGATE",
+        "paymentState": "PENDING",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_RAIL",
+        "slaMinutes": 240
+      }
+    },
+
+    "iso20022_shared": {
+      "description": "ISO 20022 pacs.002 reason codes also applicable to SWIFT payments. These share the same code set as SEPA but carry different operational context in the SWIFT correspondent banking chain.",
+      "AC04": {
+        "canonical": "ACCOUNT_CLOSED",
+        "reason": "Creditor account is closed at the beneficiary bank.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AM04": {
+        "canonical": "INSUFFICIENT_FUNDS",
+        "reason": "Insufficient funds. Unexpected in outbound cross-border context - investigate.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_RAIL",
+        "slaMinutes": 120
+      },
+      "BE01": {
+        "canonical": "INCONSISTENT_WITH_END_CUSTOMER",
+        "reason": "Creditor details inconsistent with the end customer at the beneficiary bank.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "FF01": {
+        "canonical": "INVALID_FILE_FORMAT",
+        "reason": "Message format invalid for this SWIFT payment type.",
+        "origin": "RAIL",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      }
+    }
+  },
+
+  "t24_core": {
+    "description": "Temenos T24 core banking error codes for Meridian Bank NV. This section is bank-specific and reflects Meridian's T24 configuration, installed modules, and custom error definitions. These codes are returned by T24 to the connector during pre-flight checks (balance, account validation, compliance pre-screen) before payment submission to the rail. Maintained by Meridian's integration team with Backbase support. Last validated against Meridian's T24 R22 instance, March 2025.",
+
+    "account": {
+      "AC.NOT.FOUND": {
+        "canonical": "ACCOUNT_NOT_FOUND",
+        "reason": "Debtor account does not exist in T24.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60,
+        "notes": "Account lookup failed in T24 FT module. Verify account number with customer."
+      },
+      "AC.CLOSED": {
+        "canonical": "ACCOUNT_CLOSED",
+        "reason": "Debtor account is closed in T24.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "AC.BLOCKED": {
+        "canonical": "ACCOUNT_BLOCKED",
+        "reason": "Debtor account is blocked in T24.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 60,
+        "notes": "Account blocking may be compliance-related. Do not share block reason with customer until compliance approval."
+      },
+      "AC.DORMANT": {
+        "canonical": "ACCOUNT_DORMANT",
+        "reason": "Debtor account is dormant.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AC.RESTRICTED": {
+        "canonical": "ACCOUNT_RESTRICTED",
+        "reason": "Debtor account has transaction restrictions applied.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 60
+      },
+      "AC.FROZEN": {
+        "canonical": "ACCOUNT_FROZEN",
+        "reason": "Debtor account is frozen, typically due to legal or regulatory hold.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 30,
+        "notes": "URGENT - account freeze may indicate legal action. Escalate to compliance immediately."
+      },
+      "AC.DEBIT.NOT.ALLOWED": {
+        "canonical": "DEBIT_NOT_ALLOWED",
+        "reason": "Debit transactions are not permitted on this account.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AC.CREDIT.NOT.ALLOWED": {
+        "canonical": "CREDIT_NOT_ALLOWED",
+        "reason": "Credit transactions are not permitted on this account type.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      }
+    },
+
+    "balance": {
+      "INSUFF.FUNDS": {
+        "canonical": "INSUFFICIENT_FUNDS",
+        "reason": "Insufficient funds in the debtor account to cover the payment amount.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "INSUFF.AVAILABLE.BAL": {
+        "canonical": "INSUFFICIENT_AVAILABLE_BALANCE",
+        "reason": "Insufficient available balance. Account may have a portion of funds held or reserved.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60,
+        "notes": "Cleared balance vs available balance distinction. Customer may have pending transactions holding funds."
+      }
+    },
+
+    "limits": {
+      "DAILY.LIMIT.EXCEEDED": {
+        "canonical": "DAILY_LIMIT_EXCEEDED",
+        "reason": "Payment exceeds the customer's daily transaction limit.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "TRANS.LIMIT.EXCEEDED": {
+        "canonical": "TRANSACTION_LIMIT_EXCEEDED",
+        "reason": "Payment amount exceeds the per-transaction limit.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "MONTHLY.LIMIT.EXCEEDED": {
+        "canonical": "MONTHLY_LIMIT_EXCEEDED",
+        "reason": "Payment would exceed the customer's monthly transaction limit.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "MINIMUM.AMOUNT.ERROR": {
+        "canonical": "BELOW_MINIMUM_AMOUNT",
+        "reason": "Payment amount is below the minimum allowed for this account or product.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "MAXIMUM.AMOUNT.ERROR": {
+        "canonical": "EXCEEDS_MAXIMUM_AMOUNT",
+        "reason": "Payment amount exceeds the maximum allowed for this account or product.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      }
+    },
+
+    "validation": {
+      "EB-CHK-VAL-001": {
+        "canonical": "VALIDATION_ERROR_GENERAL",
+        "reason": "General validation error in T24 Enterprise Banking module.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60,
+        "notes": "Generic T24 EB validation error. Check T24 application logs for field-level detail."
+      },
+      "EB-CHK-VAL-002": {
+        "canonical": "VALIDATION_ERROR_MANDATORY_FIELD",
+        "reason": "Mandatory field missing in T24 payment instruction.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "EB-CHK-VAL-003": {
+        "canonical": "VALIDATION_ERROR_FIELD_FORMAT",
+        "reason": "Field format validation failed in T24.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "INVALID.ACCOUNT.FORMAT": {
+        "canonical": "INVALID_ACCOUNT_FORMAT",
+        "reason": "Account number format is invalid in T24.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "INVALID.CURRENCY": {
+        "canonical": "INVALID_CURRENCY",
+        "reason": "Currency code is invalid or not supported by T24 for this account.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "INVALID.BIC": {
+        "canonical": "INVALID_BIC",
+        "reason": "BIC/SWIFT code is invalid or not recognised by T24.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "INVALID.IBAN": {
+        "canonical": "INVALID_IBAN",
+        "reason": "IBAN failed validation in T24.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "INVALID.AMOUNT": {
+        "canonical": "INVALID_AMOUNT",
+        "reason": "Payment amount is invalid.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "INVALID.DATE": {
+        "canonical": "INVALID_DATE",
+        "reason": "Payment date is invalid or in the past.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "INVALID.BENEFICIARY": {
+        "canonical": "INVALID_BENEFICIARY",
+        "reason": "Beneficiary details failed T24 validation.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      }
+    },
+
+    "compliance": {
+      "SANCTION.HOLD": {
+        "canonical": "SANCTIONS_HOLD",
+        "reason": "Payment flagged by T24 sanctions screening. Payment is on hold pending review.",
+        "origin": "CORE",
+        "category": "INVESTIGATE",
+        "paymentState": "HOLD",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 30,
+        "notes": "URGENT. Do not notify customer of sanctions hold. Escalate to compliance officer immediately. Regulatory reporting may be required."
+      },
+      "AML.HOLD": {
+        "canonical": "AML_HOLD",
+        "reason": "Payment flagged by T24 AML engine. Payment is on hold pending review.",
+        "origin": "CORE",
+        "category": "INVESTIGATE",
+        "paymentState": "HOLD",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 60,
+        "notes": "Do not notify customer of AML flag. Escalate to compliance officer."
+      },
+      "COMPLIANCE.HOLD": {
+        "canonical": "COMPLIANCE_HOLD",
+        "reason": "Payment held for compliance review.",
+        "origin": "CORE",
+        "category": "INVESTIGATE",
+        "paymentState": "HOLD",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 60
+      },
+      "OFAC.HOLD": {
+        "canonical": "OFAC_HOLD",
+        "reason": "Payment flagged against OFAC SDN list. Immediate compliance escalation required.",
+        "origin": "CORE",
+        "category": "INVESTIGATE",
+        "paymentState": "HOLD",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 15,
+        "notes": "CRITICAL. OFAC match requires immediate compliance officer notification. Potential regulatory reporting obligation within 24 hours."
+      },
+      "PEP.HOLD": {
+        "canonical": "PEP_HOLD",
+        "reason": "Payment involves a Politically Exposed Person (PEP). Enhanced due diligence required.",
+        "origin": "CORE",
+        "category": "INVESTIGATE",
+        "paymentState": "HOLD",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 60
+      },
+      "KYC.INCOMPLETE": {
+        "canonical": "KYC_INCOMPLETE",
+        "reason": "Customer KYC documentation is incomplete or expired.",
+        "origin": "CORE",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60,
+        "notes": "Customer must complete KYC refresh before payment can be processed."
+      }
+    },
+
+    "system": {
+      "SYS.ERROR": {
+        "canonical": "CORE_SYSTEM_ERROR",
+        "reason": "T24 returned a generic system error. No specific error code available.",
+        "origin": "CORE",
+        "category": "RETRYABLE",
+        "paymentState": "UNKNOWN",
+        "retryable": true,
+        "retryAfterMinutes": 5,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 30,
+        "notes": "CAUTION: Payment state is unknown. Before retrying, confirm with T24 team whether the payment was processed. Duplicate risk if retried without verification."
+      },
+      "DB.LOCK": {
+        "canonical": "DATABASE_LOCK",
+        "reason": "T24 database lock prevented payment processing.",
+        "origin": "CORE",
+        "category": "RETRYABLE",
+        "paymentState": "UNKNOWN",
+        "retryable": true,
+        "retryAfterMinutes": 2,
+        "opsAction": "RETRY_SAFE",
+        "slaMinutes": 15,
+        "notes": "Transient T24 database contention. Safe to retry after 2 minutes."
+      },
+      "TIMEOUT.ERROR": {
+        "canonical": "CORE_TIMEOUT",
+        "reason": "T24 pre-flight check timed out. Payment was not submitted to the rail.",
+        "origin": "CORE",
+        "category": "RETRYABLE",
+        "paymentState": "REJECTED",
+        "retryable": true,
+        "retryAfterMinutes": 5,
+        "opsAction": "RETRY_SAFE",
+        "slaMinutes": 15,
+        "notes": "Safe to retry - payment was not submitted to rail before timeout."
+      },
+      "MODULE.UNAVAILABLE": {
+        "canonical": "CORE_MODULE_UNAVAILABLE",
+        "reason": "Required T24 module is unavailable.",
+        "origin": "CORE",
+        "category": "RETRYABLE",
+        "paymentState": "REJECTED",
+        "retryable": true,
+        "retryAfterMinutes": 15,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 30,
+        "notes": "Contact T24 operations team to check module availability."
+      },
+      "RECORD.LOCKED": {
+        "canonical": "RECORD_LOCKED",
+        "reason": "Account record is locked in T24 by another process.",
+        "origin": "CORE",
+        "category": "RETRYABLE",
+        "paymentState": "REJECTED",
+        "retryable": true,
+        "retryAfterMinutes": 1,
+        "opsAction": "RETRY_SAFE",
+        "slaMinutes": 15
+      }
+    }
+  },
+
+  "connector": {
+    "description": "Errors generated by the Grand Central Payments Connector itself. These are fully owned by the connector and apply to all bank implementations. No bank-specific customisation.",
+
+    "validation": {
+      "INVALID_IBAN_CHECKSUM": {
+        "canonical": "INVALID_IBAN_CHECKSUM",
+        "reason": "Creditor IBAN failed MOD-97 checksum validation at connector level.",
+        "origin": "CONNECTOR",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "AMOUNT_OUT_OF_RANGE": {
+        "canonical": "AMOUNT_OUT_OF_RANGE",
+        "reason": "Payment amount exceeds the maximum permitted for this payment method.",
+        "origin": "CONNECTOR",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      },
+      "MISSING_REQUIRED_FIELD": {
+        "canonical": "MISSING_REQUIRED_FIELD",
+        "reason": "Required field missing from payment instruction.",
+        "origin": "CONNECTOR",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "INVALID_PAYMENT_METHOD": {
+        "canonical": "INVALID_PAYMENT_METHOD",
+        "reason": "Payment method is not supported by this connector instance.",
+        "origin": "CONNECTOR",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 60
+      },
+      "INVALID_BIC_FORMAT": {
+        "canonical": "INVALID_BIC",
+        "reason": "BIC/SWIFT code does not conform to ISO 9362 format.",
+        "origin": "CONNECTOR",
+        "category": "TERMINAL",
+        "paymentState": "REJECTED",
+        "retryable": false,
+        "opsAction": "NOTIFY_CUSTOMER",
+        "slaMinutes": 60
+      }
+    },
+
+    "timeout": {
+      "RAIL_TIMEOUT_SOCKET": {
+        "canonical": "RAIL_TIMEOUT",
+        "reason": "Rail did not respond within the connector timeout window (SocketTimeoutException).",
+        "origin": "CONNECTOR",
+        "category": "INVESTIGATE",
+        "paymentState": "UNKNOWN",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_DO_NOT_RETRY",
+        "slaMinutes": 15,
+        "notes": "CAUTION: Payment state is UNKNOWN. Payment may have been received by the rail before the timeout. Do NOT retry without first confirming payment state via scheme inquiry or gpi tracker."
+      },
+      "RAIL_TIMEOUT_CONNECT": {
+        "canonical": "RAIL_CONNECTION_FAILED",
+        "reason": "Connector could not establish connection to the rail within timeout (ConnectException).",
+        "origin": "CONNECTOR",
+        "category": "RETRYABLE",
+        "paymentState": "REJECTED",
+        "retryable": true,
+        "retryAfterMinutes": 5,
+        "opsAction": "RETRY_SAFE",
+        "slaMinutes": 15,
+        "notes": "Connection was never established - payment was not sent to rail. Safe to retry after 5 minutes. Check rail status if persists."
+      },
+      "RAIL_TIMEOUT_READ": {
+        "canonical": "RAIL_READ_TIMEOUT",
+        "reason": "Connection established but response read timed out mid-transfer (ReadTimeoutException).",
+        "origin": "CONNECTOR",
+        "category": "INVESTIGATE",
+        "paymentState": "UNKNOWN",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_DO_NOT_RETRY",
+        "slaMinutes": 15,
+        "notes": "CAUTION: Request was sent, partial response received. Payment state UNKNOWN. Do NOT retry without confirming state via scheme inquiry."
+      },
+      "RAIL_SSL_ERROR": {
+        "canonical": "RAIL_SSL_ERROR",
+        "reason": "SSL/TLS handshake failed. Connector could not establish secure connection to rail.",
+        "origin": "CONNECTOR",
+        "category": "RETRYABLE",
+        "paymentState": "REJECTED",
+        "retryable": true,
+        "retryAfterMinutes": 5,
+        "opsAction": "INVESTIGATE_CORE",
+        "slaMinutes": 15,
+        "notes": "Payment was not sent to rail. Safe to retry. If persistent, check rail certificate status and connector keystore."
+      }
+    },
+
+    "state": {
+      "HOLD_STATE_NOT_MODELLED": {
+        "canonical": "PAYMENT_ON_HOLD",
+        "reason": "Payment is on hold for compliance or regulatory review. This is not a failure.",
+        "origin": "CONNECTOR",
+        "category": "INVESTIGATE",
+        "paymentState": "HOLD",
+        "retryable": false,
+        "opsAction": "ESCALATE_COMPLIANCE",
+        "slaMinutes": 30,
+        "notes": "The v2.0 spec does not have a HOLD state. This entry ensures compliance holds are not surfaced as FAILED. Do not retry."
+      },
+      "SETTLEMENT_PENDING": {
+        "canonical": "SETTLEMENT_PENDING",
+        "reason": "Payment accepted by rail but final settlement confirmation not yet received. This is not a failure.",
+        "origin": "CONNECTOR",
+        "category": "INVESTIGATE",
+        "paymentState": "PENDING",
+        "retryable": false,
+        "opsAction": "MONITOR",
+        "slaMinutes": 1440,
+        "notes": "Monitor gpi tracker for SWIFT. For SEPA, check scheme dashboard. Do not retry."
+      }
+    },
+
+    "translation": {
+      "RESPONSE_PARSE_FAILED": {
+        "canonical": "RESPONSE_PARSE_FAILED",
+        "reason": "Connector could not parse the response received from the rail.",
+        "origin": "CONNECTOR",
+        "category": "INVESTIGATE",
+        "paymentState": "UNKNOWN",
+        "retryable": false,
+        "opsAction": "INVESTIGATE_DO_NOT_RETRY",
+        "slaMinutes": 30,
+        "notes": "Raw response preserved in rawCode. Escalate to Backbase engineering with gcTransactionId."
+      }
+    }
+  },
+
+  "fallback": {
+    "description": "Applied when no matching code is found in any of the above sections. The raw code from the source system is preserved in rawCode for investigation. This entry ensures the canonical envelope is always produced regardless of whether the code is known.",
+    "UNRESOLVED_ERROR": {
+      "canonical": "UNRESOLVED_ERROR",
+      "reason": "An error occurred that could not be mapped to a known code. See rawCode for the original value.",
+      "origin": "UNKNOWN",
+      "category": "INVESTIGATE",
+      "paymentState": "UNKNOWN",
+      "retryable": false,
+      "opsAction": "INVESTIGATE",
+      "slaMinutes": 60,
+      "notes": "Log the rawCode value and report to Backbase FDPM. Unknown codes should be added to the config in the next maintenance cycle to improve future triage."
+    }
+  }
+}
