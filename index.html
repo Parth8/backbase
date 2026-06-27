@@ -83,33 +83,19 @@
         <div style="padding:12px 22px; background:var(--paper-4); border-bottom:1px solid var(--line-strong);">
           <span class="figtag u-pine">Backbase · my side</span>
         </div>
-        <!-- row 1 -->
-        <div style="padding:13px 22px; border-bottom:1px solid var(--line); border-right:1px solid var(--line-strong);">
-          <div class="stake__name">Henrik · CTO</div><div class="stake__role">Reports to the board · sent the status request</div>
+        <!-- two independent columns, divider between -->
+        <div style="border-right:1px solid var(--line-strong);">
+          <div style="padding:13px 22px; border-bottom:1px solid var(--line);"><div class="stake__name">Henrik · CTO</div><div class="stake__role">Reports to the board · sent the status request</div></div>
+          <div style="padding:13px 22px; border-bottom:1px solid var(--line);"><div class="stake__name">Anna · Head of Payments</div><div class="stake__role">Reports to COO · can escalate past Henrik</div></div>
+          <div style="padding:13px 22px; border-bottom:1px solid var(--line);"><div class="stake__name">Peter · Head of Eng &amp; Integration</div><div class="stake__role">UAT &amp; QA lead · signed the spec · I plan with him</div></div>
+          <div style="padding:13px 22px;"><div class="stake__name">Maria · Payments Ops Lead</div><div class="stake__role">Runs ops day one · flagged this for weeks</div></div>
         </div>
-        <div style="padding:13px 22px; border-bottom:1px solid var(--line);">
-          <div class="stake__name">Me · Forward Deployed PM</div><div class="stake__role">Own the product surface at the customer</div>
-        </div>
-        <!-- row 2 -->
-        <div style="padding:13px 22px; border-bottom:1px solid var(--line); border-right:1px solid var(--line-strong);">
-          <div class="stake__name">Anna · Head of Payments</div><div class="stake__role">Reports to COO · can escalate past Henrik</div>
-        </div>
-        <div style="padding:13px 22px; border-bottom:1px solid var(--line);">
-          <div class="stake__name">Solution Architect</div><div class="stake__role">Designed the integration · now advisory</div>
-        </div>
-        <!-- row 3 -->
-        <div style="padding:13px 22px; border-bottom:1px solid var(--line); border-right:1px solid var(--line-strong);">
-          <div class="stake__name">Peter · Head of Eng &amp; Integration</div><div class="stake__role">Engineering & QA Lead · signed the spec · I plan with him</div>
-        </div>
-        <div style="padding:13px 22px; border-bottom:1px solid var(--line);">
-          <div class="stake__name">2 Engineers · QA Lead</div><div class="stake__role">Building and testing the happy path</div>
-        </div>
-        <!-- row 4 -->
-        <div style="padding:13px 22px; border-right:1px solid var(--line-strong);">
-          <div class="stake__name">Maria · Payments Ops Lead</div><div class="stake__role">Runs ops day one · flagged this inconsistency</div>
-        </div>
-        <div style="padding:13px 22px;">
-          <div class="stake__name">Customer Success Dir · Connector PM</div><div class="stake__role">Owns the relationship · owns the platform baseline</div>
+        <div>
+          <div style="padding:13px 22px; border-bottom:1px solid var(--line);"><div class="stake__name">Me · Forward Deployed PM</div><div class="stake__role">Own the product surface at the customer</div></div>
+          <div style="padding:13px 22px; border-bottom:1px solid var(--line);"><div class="stake__name">Solution Architect</div><div class="stake__role">Designed the integration · now advisory</div></div>
+          <div style="padding:13px 22px; border-bottom:1px solid var(--line);"><div class="stake__name">2 Engineers + QA</div><div class="stake__role">Building and testing the happy path</div></div>
+          <div style="padding:13px 22px; border-bottom:1px solid var(--line);"><div class="stake__name">Customer Success Director</div><div class="stake__role">Owns the relationship and the commercial</div></div>
+          <div style="padding:13px 22px;"><div class="stake__name">Connector PM <span class="muted" style="font-weight:400;">· HQ</span></div><div class="stake__role">Owns the platform baseline and roadmap</div></div>
         </div>
       </div>
     </div>
@@ -298,68 +284,100 @@
   </div>
 </section>
 
-<!-- SLIDE 7 - Slicing by origin (the reveal) -->
+<!-- SLIDE 7 - Slicing the failures (two cuts) -->
 <section class="slide" id="s7">
   <div class="wrap wrap--wide">
     <div class="eyebrow enter" data-d="1">The Investigation · Slicing the 47</div>
-    <h2 class="display display--m enter" data-d="1">I sort the failures by where they came from</h2>
-    <p class="prose enter" data-d="2" style="margin:16px 0 26px; max-width:74ch;">
-      Not by error text, by <strong>origin</strong>: did the failure come from the core, the connector,
-      or the rail? The moment I group them this way, the randomness disappears.
+    <h2 class="display display--m enter" data-d="1">A real read takes more than one cut</h2>
+    <p class="prose enter" data-d="2" style="margin:14px 0 24px; max-width:78ch;">
+      I load the 47 into a notebook and start slicing. The first cut I try is the obvious one, by rail.
+      It is useful but it does not fully explain the mess. The second cut, by origin, is the one that lands.
     </p>
 
-    <div class="enter" data-d="3" style="max-width:920px;">
-      <table class="tbl">
-        <thead>
-          <tr><th>Origin</th><th>What happened</th><th class="num">Count</th><th class="num">Usable to ops?</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="rowhead">Rail</td><td class="muted">Documented SEPA reject code</td><td class="num">19</td><td class="cell cell--good">yes</td></tr>
-          <tr><td class="rowhead">Connector</td><td class="muted">Caught at validation, clear error</td><td class="num">5</td><td class="cell cell--good">yes</td></tr>
-          <tr><td class="rowhead u-rust">Core</td><td class="muted">T24 code, no translation mapping</td><td class="num">13</td><td class="cell cell--bad">raw</td></tr>
-          <tr><td class="rowhead u-rust">Rail</td><td class="muted">SWIFT code, not standardised</td><td class="num">5</td><td class="cell cell--bad">generic</td></tr>
-          <tr><td class="rowhead u-rust">Connector</td><td class="muted">Timeout, exception not caught</td><td class="num">5</td><td class="cell cell--bad">blank</td></tr>
-        </tbody>
-      </table>
+    <div class="cols-2 enter" data-d="3" style="gap:32px; align-items:start;">
+      <!-- Cut 1 -->
+      <div>
+        <p class="figtag" style="margin-bottom:10px;">Cut 1 · by rail <span class="muted">- inconclusive</span></p>
+        <table class="tbl" style="font-size:13.5px;">
+          <thead><tr><th>Rail</th><th class="num">Usable</th><th class="num">Raw</th><th class="num">Generic</th><th class="num">Blank</th></tr></thead>
+          <tbody>
+            <tr><td class="rowhead">SCT</td><td class="num">11</td><td class="num u-rust">7</td><td class="num muted">-</td><td class="num muted">-</td></tr>
+            <tr><td class="rowhead">SCT Inst</td><td class="num">8</td><td class="num u-rust">6</td><td class="num muted">-</td><td class="num u-rust">5</td></tr>
+            <tr><td class="rowhead">SWIFT</td><td class="num">5</td><td class="num muted">-</td><td class="num u-rust">5</td><td class="num muted">-</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:13.5px; margin:12px 2px 0;">Blanks are all on the real-time rail, generics are all SWIFT. A hint. But the <span class="u-rust">raw</span> failures cut across both SEPA rails, so rail alone does not explain it.</p>
+      </div>
+      <!-- Cut 2 -->
+      <div>
+        <p class="figtag u-pine" style="margin-bottom:10px;">Cut 2 · by origin <span class="muted">- the pattern</span></p>
+        <table class="tbl js-reveal" style="font-size:13.5px;">
+          <thead><tr><th>Origin</th><th>What happened</th><th class="num">n</th><th class="num">Usable?</th></tr></thead>
+          <tbody>
+            <tr><td class="rowhead">Rail</td><td class="muted">Documented SEPA reject</td><td class="num">19</td><td class="cell cell--good">yes</td></tr>
+            <tr><td class="rowhead">Connector</td><td class="muted">Caught at validation</td><td class="num">5</td><td class="cell cell--good">yes</td></tr>
+            <tr><td class="rowhead u-rust">Core</td><td class="muted">T24 code, no mapping</td><td class="num">13</td><td class="cell cell--bad">raw</td></tr>
+            <tr><td class="rowhead u-rust">Rail</td><td class="muted">SWIFT code, not standardised</td><td class="num">5</td><td class="cell cell--bad">generic</td></tr>
+            <tr><td class="rowhead u-rust">Connector</td><td class="muted">Timeout, not caught</td><td class="num">5</td><td class="cell cell--bad">blank</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:13.5px; margin:12px 2px 0;">Group by where it came from and the split is clean: <span class="u-pine">24 usable</span>, <span class="u-rust">23 not</span>.</p>
+      </div>
     </div>
 
-    <div class="cols-2 enter" data-d="4" style="margin-top:26px; gap:40px;">
-      <div class="panel panel--pine">
-        <p style="margin:0; font-size:18px; line-height:1.5;">The 47 split into <strong>24 usable</strong> and <strong>23 not</strong>, and the line between them is one thing: <strong>did the connector have a way to translate it?</strong></p>
-      </div>
-      <p class="prose u-mb-0" style="font-size:16px;">Where the connector knew the code, ops got a clean answer. Where it did not - a core code with no mapping, a SWIFT code it never standardised, a timeout it never caught - ops got raw, generic, or nothing. <span class="hi-pine">It is structural, not random.</span></p>
+    <div class="panel panel--pine enter" data-d="4" style="margin-top:24px;">
+      <p style="margin:0; font-size:18px; line-height:1.5;">The line between usable and not is one thing: <strong>did the connector have a way to translate the code?</strong> Where it knew the code, ops got a clean answer. Where it did not, a core code with no mapping, a SWIFT code it never standardised, a timeout it never caught, ops got raw, generic, or nothing. <span class="hi-saffron">It is structural, not random.</span></p>
     </div>
   </div>
 </section>
 
-<!-- SLIDE 8 - Investigation: Confluence, release notes, API history -->
+<!-- SLIDE 8 - Investigation: method, the record, API history -->
 <section class="slide" id="s8">
   <div class="wrap wrap--wide">
     <div class="eyebrow enter" data-d="1">The Investigation · Into the Record</div>
-    <h2 class="display display--m enter" data-d="1">Before I look at code, I look at history</h2>
-    <p class="prose enter" data-d="2" style="margin:14px 0 24px; max-width:76ch;">
-      As the product person, my first stop is the written record: the connector's Confluence space and
-      the release notes. Two earlier bank patches surface, and the API version history explains why
-      this keeps happening.
+    <h2 class="display display--m enter" data-d="1">Before I touch code, I work out what kind of problem this is</h2>
+    <p class="prose enter" data-d="2" style="margin:14px 0 20px; max-width:80ch;">
+      A one-off bug you fix in code. A pattern that repeats across versions you fix in the contract. The
+      fix is different, and so is the blast radius, so I need to know which one this is <strong>before</strong>
+      I commit to anything. That question drives how I trace it.
     </p>
 
-    <div class="cols-2 enter" data-d="3" style="margin-bottom:24px;">
+    <div class="enter" data-d="3" style="margin-bottom:22px;">
+      <div class="boxflow">
+        <div class="boxflow__node"><div class="boxflow__t" style="font-size:15px;">Reproduce</div><div class="boxflow__s">confirm in the data, not hearsay</div></div>
+        <div class="boxflow__arrow">→</div>
+        <div class="boxflow__node"><div class="boxflow__t" style="font-size:15px;">Check the contract</div><div class="boxflow__s">is a blank even valid? yes</div></div>
+        <div class="boxflow__arrow">→</div>
+        <div class="boxflow__node"><div class="boxflow__t" style="font-size:15px;">Search the record</div><div class="boxflow__s">Confluence + release notes</div></div>
+        <div class="boxflow__arrow">→</div>
+        <div class="boxflow__node"><div class="boxflow__t" style="font-size:15px;">Diff the versions</div><div class="boxflow__s">what grew, what did not</div></div>
+      </div>
+    </div>
+
+    <div class="cols-2 enter" data-d="4" style="margin-bottom:20px;">
       <div class="panel">
-        <div class="mail__subj" style="margin-bottom:8px;">Confluence · first implementation</div>
+        <div class="mail__subj" style="margin-bottom:8px;">Confluence + release notes · first implementation</div>
         <p style="font-weight:600; font-size:16px; margin:0 0 6px;">Apex Banking <span class="muted u-mono" style="font-size:12px;">v1 · SCT</span></p>
         <p class="muted" style="font-size:14px; margin:0 0 10px;">SEPA reject codes were not being translated. The FDPM added a custom transformer to surface them.</p>
         <span class="tag tag--rust"><span class="tag__dot"></span>Lives in the Apex build only</span>
       </div>
       <div class="panel">
-        <div class="mail__subj" style="margin-bottom:8px;">Confluence · second implementation</div>
+        <div class="mail__subj" style="margin-bottom:8px;">Confluence + release notes · second implementation</div>
         <p style="font-weight:600; font-size:16px; margin:0 0 6px;">Sparkasse Mittelrhein <span class="muted u-mono" style="font-size:12px;">v2 · SCT + Inst</span></p>
         <p class="muted" style="font-size:14px; margin:0 0 10px;">A connector timeout returned an empty response. They wrapped it to return a fixed timeout code.</p>
         <span class="tag tag--rust"><span class="tag__dot"></span>Lives in the Sparkasse config only</span>
       </div>
     </div>
 
-    <div class="enter" data-d="4" style="background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden;">
-      <div style="padding:11px 18px; background:var(--paper-4); border-bottom:1px solid var(--line-strong);"><span class="figtag">API version history · the asymmetry</span></div>
+    <div class="enter" data-d="5" style="background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden;">
+      <div style="padding:11px 18px; background:var(--paper-4); border-bottom:1px solid var(--line-strong); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span class="figtag">API version history · the asymmetry</span>
+        <div style="display:flex; gap:7px;">
+          <a class="artifact" href="resources/api-v1.html" target="_blank" rel="noopener" style="padding:4px 9px;">API v1</a>
+          <a class="artifact" href="resources/api-v2.html" target="_blank" rel="noopener" style="padding:4px 9px;">API v2</a>
+          <a class="artifact" href="resources/api-v3.html" target="_blank" rel="noopener" style="padding:4px 9px;">API v3</a>
+        </div>
+      </div>
       <table class="tbl" style="font-size:14px;">
         <thead><tr><th>Version</th><th>Rails added</th><th class="num">Request fields</th><th>Failure response</th></tr></thead>
         <tbody>
@@ -369,7 +387,7 @@
         </tbody>
       </table>
     </div>
-    <p class="marg enter" data-d="5" style="margin-top:16px; max-width:80ch;"><span class="marg__label">Built on the standard, on one side only</span>The request side mirrors ISO 20022 <span class="u-mono">pain.001</span>: <span class="u-mono" style="font-size:12px;">debtorAgent.bic, endToEndId, instructedAmount</span>. It grew carefully with every rail. The failure response never got the same discipline. <strong>The spec is the gap, and it was never one bank's fault.</strong></p>
+    <p class="marg enter" data-d="6" style="margin-top:14px; max-width:82ch;"><span class="marg__label">The answer: it is a pattern, not a bug</span>The request side mirrors ISO 20022 <span class="u-mono">pain.001</span> and grew carefully with every rail. The failure response never got the same discipline. Two banks already patched around it in their own builds. <strong>This is a contract gap, and it is no single bank's fault.</strong></p>
   </div>
 </section>
 
@@ -439,29 +457,59 @@ it through raw</span><span class="code__line"><span class="t-com">returned to co
 <!-- ACT 4 - THE DECISION                                   -->
 <!-- ===================================================== -->
 
-<!-- SLIDE 11 - Engineering's proposal + the trade-off -->
+<!-- SLIDE 11 - The decision: joint call, trade-off, stakeholders -->
 <section class="slide" id="s11">
   <div class="wrap wrap--wide">
-    <div class="eyebrow enter" data-d="1">The Decision</div>
-    <h2 class="display display--m enter" data-d="1">Three ways to fix it. Only one is right.</h2>
-    <p class="prose enter" data-d="2" style="margin:14px 0 24px; max-width:76ch;">
-      Engineering proposes the fast option: let Meridian build a small interpreter on the T24 side to
-      clean up whatever the connector returns. It works, it protects the date, and it is <strong>exactly
-      what Apex and Sparkasse did</strong>. That is the reason I say no.
+    <div class="eyebrow enter" data-d="1">The Decision · A joint working session</div>
+    <h2 class="display display--m enter" data-d="1">Three options on one table, decided together</h2>
+    <p class="prose enter" data-d="2" style="margin:14px 0 22px; max-width:82ch;">
+      I do not settle this in side conversations or hand down a verdict. I bring Peter, the Solution
+      Architect, our engineers, and the CSD into one working session and we weigh three approaches
+      against what actually matters: the date, regression risk, and who carries the cost afterwards.
     </p>
+
     <div class="enter" data-d="3">
-      <table class="tbl">
-        <thead><tr><th>Option</th><th>What it is</th><th class="num">Risk to launch</th><th class="num">Verdict</th></tr></thead>
+      <table class="tbl" style="font-size:14px;">
+        <thead><tr><th>Option</th><th class="num">Coverage</th><th class="num">Risk to date</th><th class="num">Regression</th><th>Who owns the cost</th><th class="num">Verdict</th></tr></thead>
         <tbody>
-          <tr><td class="rowhead">Bank-side interpreter</td><td class="muted">Meridian cleans up responses on the T24 side</td><td class="cell cell--good">Low</td><td class="cell cell--bad">No - repeats the pattern</td></tr>
-          <tr><td class="rowhead">Change the connector now</td><td class="muted">Rebuild the response logic in code</td><td class="cell cell--bad">High</td><td class="cell cell--bad">No - touches tested code</td></tr>
-          <tr style="background:var(--pine-soft);"><td class="rowhead u-pine">Expand the config</td><td class="muted">Map the missing codes, no code change</td><td class="cell cell--good">Low</td><td class="cell cell--good">Yes</td></tr>
+          <tr>
+            <td><span class="rowhead">Bank-side interpreter</span><br><span class="muted" style="font-size:12.5px;">Meridian cleans up responses on the T24 side</span></td>
+            <td class="cell muted">Core only</td><td class="cell cell--good">Low</td><td class="cell cell--good">None</td>
+            <td class="muted">Meridian, and every future bank repeats it</td><td class="cell cell--bad">No</td>
+          </tr>
+          <tr>
+            <td><span class="rowhead">Change the connector now</span><br><span class="muted" style="font-size:12.5px;">Rebuild the response logic in code</span></td>
+            <td class="cell cell--good">All layers</td><td class="cell cell--bad">High</td><td class="cell cell--bad">Medium</td>
+            <td class="muted">Backbase, under deadline</td><td class="cell cell--bad">No</td>
+          </tr>
+          <tr style="background:var(--pine-soft);">
+            <td><span class="rowhead u-pine">Expand the config</span><br><span class="muted" style="font-size:12.5px;">Map the missing codes, no code change</span></td>
+            <td class="cell cell--good">Core + rail + timeout</td><td class="cell cell--good">Low</td><td class="cell cell--good">None</td>
+            <td class="muted">Shared, and feeds the platform fix</td><td class="cell cell--good">Yes</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <div class="cols-2 enter" data-d="4" style="margin-top:24px; gap:40px;">
-      <p class="prose u-mb-0" style="font-size:16px;">The bank-side fix makes Meridian own our gap, and leaves the next bank to rediscover it. The third instance of a pattern is where you break it, not repeat it.</p>
-      <p class="prose u-mb-0" style="font-size:16px;">I will not push code changes into a tested connector 20 days out. <span class="hi-pine">Config gets ops most of the way, with no code risk and no disruption to a fully-loaded team.</span></p>
+
+    <div class="cols-2 enter" data-d="4" style="margin-top:24px; gap:36px; align-items:start;">
+      <div>
+        <p class="figtag u-pine" style="margin-bottom:10px;">How the call actually goes</p>
+        <ul class="list" style="gap:11px;">
+          <li class="list__item"><span class="list__num list__num--check" style="border:none; color:var(--pine);">›</span><span class="list__t">Engineering's instinct is sound and I say so. The issue is not effort, it is that the bank-side fix makes Meridian own our gap and leaves the next bank to rediscover it.</span></li>
+          <li class="list__item"><span class="list__num" style="border:none; color:var(--pine);">›</span><span class="list__t">We land on config <strong>together</strong>. It protects the tested code, so engineering keeps its sprint. It is reversible. And it is defensible upward.</span></li>
+          <li class="list__item"><span class="list__num" style="border:none; color:var(--pine);">›</span><span class="list__t">Because Peter helped weigh it, he can carry it to Anna and Henrik without me in the room.</span></li>
+        </ul>
+      </div>
+      <div>
+        <p class="figtag" style="margin-bottom:10px;">What each stakeholder needs from the outcome</p>
+        <div class="kv" style="gap:9px;">
+          <div class="kv__row" style="grid-template-columns:130px 1fr; padding-bottom:9px;"><span class="kv__k">Henrik · CTO</span><span class="kv__v" style="font-size:14.5px;">Confidence, and the date held</span></div>
+          <div class="kv__row" style="grid-template-columns:130px 1fr; padding-bottom:9px;"><span class="kv__k">Anna · Payments</span><span class="kv__v" style="font-size:14.5px;">A platform fix, not another workaround</span></div>
+          <div class="kv__row" style="grid-template-columns:130px 1fr; padding-bottom:9px;"><span class="kv__k">Peter · Eng</span><span class="kv__v" style="font-size:14.5px;">A fix he can defend that spares his sprint</span></div>
+          <div class="kv__row" style="grid-template-columns:130px 1fr; padding-bottom:9px;"><span class="kv__k">Maria · Ops</span><span class="kv__v" style="font-size:14.5px;">Something her team can run on day one</span></div>
+          <div class="kv__row" style="grid-template-columns:130px 1fr;"><span class="kv__k u-pine">My leadership</span><span class="kv__v" style="font-size:14.5px;">The same plan I gave the bank, so an escalation finds alignment, not surprise</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -553,17 +601,17 @@ it through raw</span><span class="code__line"><span class="t-com">returned to co
   <span class="t-key">"paymentId"</span><span class="t-punc">:</span> <span class="t-str">"MER-PAY-...000211"</span><span class="t-punc">,</span>   <span class="t-com">&larr; from request</span>
   <span class="t-key">"gcTransactionId"</span><span class="t-punc">:</span> <span class="t-str">"gc-ccdd3344"</span><span class="t-punc">,</span>
   <span class="t-key">"status"</span><span class="t-punc">:</span> <span class="t-str">"FAILED"</span><span class="t-punc">,</span>
-  <span class="t-key">"origin"</span><span class="t-punc">:</span> <span class="t-str">"CORE"</span><span class="t-punc">,</span>            <span class="t-com">&larr; call graph</span>
+  <span class="t-key">"origin"</span><span class="t-punc">:</span> <span class="t-str">"CORE"</span><span class="t-punc">,</span>            <span class="t-com">&larr; config map</span>
   <span class="t-key">"code"</span><span class="t-punc">:</span> <span class="t-str">"ACCOUNT_CLOSED"</span><span class="t-punc">,</span>     <span class="t-com">&larr; config map</span>
   <span class="t-key">"reason"</span><span class="t-punc">:</span> <span class="t-str">"Debtor account closed."</span><span class="t-punc">,</span> <span class="t-com">&larr; config map</span>
   <span class="t-key">"rawCode"</span><span class="t-punc">:</span> <span class="t-str">"AC.CLOSED"</span><span class="t-punc">,</span>      <span class="t-com">&larr; passthrough</span>
   <span class="t-key">"railName"</span><span class="t-punc">:</span> <span class="t-str">"SCT"</span><span class="t-punc">,</span>
   <span class="t-key">"failedTimestamp"</span><span class="t-punc">:</span> <span class="t-str">"2025-03-17T11:11Z"</span>
 <span class="t-punc">}</span></pre>
-        <p class="muted" style="font-size:13px; margin:14px 0 0;">Origin from which endpoint the connector called. Code and reason from the config map. Raw code still preserved for the core team.</p>
+        <p class="muted" style="font-size:13px; margin:14px 0 0;">Origin, code, and reason all come from the single config entry the raw code matches. The raw code itself is still preserved for the core team.</p>
       </div>
     </div>
-    <p class="marg enter" data-d="4" style="margin-top:18px; max-width:82ch;"><span class="marg__label">No invented intelligence</span>The packet says <strong>what</strong> failed and <strong>where</strong>. It deliberately does not carry retry flags or ops actions - those are the bank's call. Origin is read from the connector's call graph, never guessed from the error text.</p>
+    <p class="marg enter" data-d="4" style="margin-top:18px; max-width:82ch;"><span class="marg__label">No invented intelligence</span>The packet says <strong>what</strong> failed and <strong>where</strong>. It deliberately does not carry retry flags or ops actions, those are the bank's call. Origin comes from the same mapping entry as the code, so it is deterministic, not guessed from the error text and not tracked as runtime state that would break at scale.</p>
   </div>
 </section>
 
@@ -603,9 +651,16 @@ it through raw</span><span class="code__line"><span class="t-com">returned to co
       </div>
     </div>
 
-    <div class="panel panel--inset enter" data-d="4" style="margin-top:22px; border-left:3px solid var(--pine);">
-      <p class="figtag" style="margin-bottom:8px;">What I tell Henrik by end of day</p>
-      <p style="margin:0; font-size:17px; line-height:1.5;">"We found the pattern. The connector is behaving to spec; the gap is in how that spec describes failures. We resolve the large majority by configuration, with no change to the code your integration is tested against, and no risk to the date. The deeper fix is already moving at the platform level. <strong>The date holds.</strong>"</p>
+    <div class="mail mail--cta enter" data-d="4" style="margin-top:22px;">
+      <div class="mail__head"><span class="mail__from">To: Henrik · CTO</span><span class="mail__meta">Wed, EOD</span></div>
+      <div class="mail__subj">RE: Payments go-live status</div>
+      <div class="mail__body">
+        <p>Henrik,</p>
+        <p>We found the pattern. The connector is behaving to spec; the gap is in how that spec describes failures, so your ops team cannot route every case. It is a known shape of problem and it is addressable.</p>
+        <p>For launch, we resolve the large majority by configuration, with no change to the code your integration is already tested against, and no risk to the date. A small set of edge cases gets a documented path for Maria's team. In parallel, I am opening the deeper fix at the platform level so this is solved properly for Meridian and the releases after it.</p>
+        <p><strong>The date holds.</strong> I will bring Peter the full detail and copy you on the plan.</p>
+        <p>Regards,<br>Parth</p>
+      </div>
     </div>
   </div>
 </section>
