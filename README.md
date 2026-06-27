@@ -1,95 +1,91 @@
-# Meridian Bank · Grand Central Payments Connector — Case Study
+# Grand Central Payments Connector - Case Study
 
-A Forward Deployed Product Manager case study, presented as an interactive deck.
-
-**The problem:** a banking payments connector (SCT, SCT Inst, SWIFT), four weeks
-from go-live, returns failure responses its client's ops team cannot read. What
-looks like a connector defect turns out to be a failure-response contract that
-never evolved while the request side did — the same gap surfacing across three
-bank implementations because patches live in each bank's fork and never reach the
-platform baseline.
-
-The deck walks the diagnosis, the data, the systemic signal, the stakeholder
-management, and the go-live-vs-platform decision.
+**Parth · Forward Deployed Product Manager · Backbase**
 
 ---
 
-## Running it
+## The case
 
-It's a static site. Open `index.html` in any modern browser, or serve the folder:
+A banking iPaaS connector, four weeks from go-live, is returning payment failure responses the bank's ops team cannot act on. Some are structured and routable. Others are blank, generic, or raw core codes with no translation. The ops team cannot tell, from the failure itself, where in the flow it originated.
 
-```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
-```
+Engineering's position: the connector is passing through whatever the core or rail returns, and behaving correctly per the v3 spec. The bank's position: the platform is not ready to go live. Neither side had hard evidence yet.
 
-### Presenting
-- **Arrow keys / Space** — next / previous
-- **← →** — navigate
-- **1–6** — jump to an act
-- **Home / End** — first / last slide
-- Click any node on the bottom rail to jump to that act
+The case question asks four things:
 
-The deck is keyboard-driven and built for live presenting. It respects
-`prefers-reduced-motion`.
+1. **Diagnose** - how do you get to the truth of where the problem lies, and what does that investigation look like?
+2. **Product thinking** - this is the third time the same pattern has surfaced. What does that signal, and what do you do with it beyond fixing it for this bank?
+3. **Trade-off** - engineering proposes a quick client-side workaround to make the go-live date. Do you take it? What are the implications?
+4. **Stakeholder communication** - what do you tell the CTO today, before you have a full answer?
 
 ---
 
-## Deploying to GitHub Pages
+## What this repo contains
 
-This repo is structured to serve from the root. In the repo settings, set
-**Pages → Build and deployment → Source: Deploy from a branch**, branch `main`,
-folder `/ (root)`. The deck will be live at
-`https://<username>.github.io/<repo>/`.
+### The presentation
 
----
+`index.html` - a 15-slide interactive deck covering the full case. Navigate with arrow keys, Space, or the progress rail along the bottom. Press 1-6 to jump to an act.
 
-## Structure
+The six acts: Setting the Scene, The Crisis, The Investigation, The Decision, The Fix, The Resolution.
 
-```
-.
-├── index.html                 # the presentation (30 slides, 6 acts)
-├── assets/
-│   ├── css/
-│   │   └── styles.css          # design system + motion
-│   └── js/
-│       ├── presentation.js     # navigation, rail progress, keyboard
-│       └── animations.js       # per-slide reveals (clustering, SVG draw, counters)
-└── resources/                  # the real artifacts, linked from the deck
-    ├── gc-payments-connector-v1.0.yaml      # OpenAPI — Apex era, SCT only
-    ├── gc-payments-connector-v1.5.yaml      # OpenAPI — Sparkasse era, + SCT Inst
-    ├── gc-payments-connector-v2.0.yaml      # OpenAPI — Meridian era, + SWIFT
-    ├── meridian_uat_cycle3_transactions.csv # 500 synthetic UAT transactions
-    ├── meridian_uat_cycle3_connector_logs.csv # 301 connector log lines
-    └── gc_error_mapping_config_v2.json      # 134-entry error mapping config
-```
+### The investigation artifacts
 
----
+`resources/meridian_uat_cycle3_transactions.csv` - 500 synthetic UAT transactions from cycle 3, with full request and response payloads. 47 failures across SCT, SCT Inst, and SWIFT. Includes origin columns for cross-referencing with the analysis in the deck.
 
-## The artifacts
+`resources/meridian_uat_cycle3_connector_logs.csv` - 301 connector log lines across the 47 failures. Contains the two smoking-gun entries: the unhandled timeout on SCT Inst, and the no-mapping passthrough on the T24 core code.
 
-Everything in `resources/` is real and self-consistent — the deck links to it
-directly so it can be inspected.
+### The API contracts
 
-- **Three OpenAPI specs** show the contract evolving across versions. The request
-  side grows from ~7 fields to 20+ to absorb each new rail; the failure response
-  barely changes. That asymmetry is the case.
-- **The transaction dataset** (500 rows, 47 failures) carries full request and
-  response payloads. The 47 failures cluster — invisibly on the surface, clearly
-  when pivoted by failure category — onto four structural gaps.
-- **The connector logs** (301 lines) contain the smoking guns: an unhandled
-  `ConnectException`, and `No translation mapping found for T24 code … passing
-  through raw.`
-- **The error mapping config** (134 entries across SEPA, SWIFT, T24, and
-  connector-generated codes) is the go-live fix made concrete: the canonical
-  envelope is the platform contract; the core-error mapping is bank-owned config.
+Three versions of the Grand Central Payments Connector OpenAPI spec, one per bank implementation. The asymmetry between the request side and the failure response side across versions is the core of the technical finding.
+
+| File | Version | Bank | Rails | Failure response |
+|---|---|---|---|---|
+| `gc-payments-connector-v1.yaml` | v1 | Apex Banking, IE | SCT | status + optional code |
+| `gc-payments-connector-v2.yaml` | v2 | Sparkasse Mittelrhein, DE | SCT + SCT Inst | unchanged from v1 |
+| `gc-payments-connector-v3.yaml` | v3 | Meridian Bank NV, NL | SCT + SCT Inst + SWIFT | unchanged from v1 |
+
+Rendered HTML views of each (no raw YAML):
+
+- `resources/api-v1.html`
+- `resources/api-v2.html`
+- `resources/api-v3.html`
+
+The v3 rendered view annotates all four failure response examples from the UAT data and explains which are actionable and why.
+
+### The proposed fix
+
+`resources/gc_error_mapping_config_v3.json` - the error mapping configuration that is the go-live fix. Maps raw codes to a canonical envelope: origin, code, reason.
+
+Three sections:
+
+- `rail` - SEPA scheme reason codes and SWIFT rejection codes. Standard across all banks. 98 entries.
+- `connector` - connector-generated codes including timeout, validation errors, and connection failures. Standard. 12 entries.
+- `core` - bank core codes. Meridian's T24 mappings. 33 entries. Bank-owned.
+- `fallback` - applied when a raw code has no match. Always returns a structured envelope. Never blank.
+
+The config does not carry retry flags, SLA targets, or ops actions. Those are the bank's operational policy, not the connector's contract.
 
 ---
 
-## Design
+## The key finding
 
-Warm Italian-studio editorial, not a dashboard. Bricolage Grotesque + Newsreader
-+ Spline Sans Mono on warm plaster, a pine-green hero with rust reserved for
-failure states, and a payment-trace rail along the bottom as the wayfinding
-signature — a transaction's journey through core → connector → rail is, literally,
-the subject.
+The request side mirrors ISO 20022 pain.001 and grew carefully with each new rail: 7 fields in v1, 12 in v2, 20+ in v3. The failure response stayed at status + optional code across all three versions.
+
+Each bank that hit the gap patched it in their own build. The patch never reached the shared baseline:
+
+- Apex Banking (v1): SEPA reject codes not translated. Fixed in the Apex build only.
+- Sparkasse Mittelrhein (v2): connector timeout returns empty. Fixed in the Sparkasse config only.
+- Meridian (v3): both of the above, rediscovered, plus SWIFT failure modes no one had standardised.
+
+The go-live fix is a config expansion - no code change, no regression. The platform fix is v3.5: making `origin` a required field so the contract treats failure as a first-class concern.
+
+---
+
+## What was rejected and why
+
+**Bank-side interpreter:** Meridian builds a client-side response cleaner on the T24 side. Low risk to the date, but makes Meridian own Backbase's gap permanently and leaves the next bank to rediscover it. The third instance of a pattern is the moment to break it, not repeat it.
+
+**Connector code change now:** Rebuilds response logic in code, 20 days from go-live. High regression risk, full sprint disruption. The fix is addressable through config alone.
+
+---
+
+*Synthetic case study. Meridian Bank NV, Apex Banking, and Sparkasse Mittelrhein are fictional. All data is generated for this case.*
